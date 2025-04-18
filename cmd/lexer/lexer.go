@@ -3,7 +3,7 @@ package lexer
 import (
 	"strings"
 	"unicode"
-	"github.com/taylantutar/tt/pkg/parser"
+	"github.com/taylantutar/tt/pkg/token"
 )
 
 type Lexer struct {
@@ -29,40 +29,40 @@ func (l *Lexer) readChar() {
 	l.readPosition++
 }
 
-func (l *Lexer) NextToken() parser.Token {
+func (l *Lexer) NextToken() token.Token {
 	l.skipWhitespace()
 
 	switch l.ch {
 	case '=':
-		tok := parser.Token{Type: parser.ASSIGN, Literal: string(l.ch)}
+		tok := token.Token{Type: token.ASSIGN, Literal: string(l.ch)}
 		l.readChar()
 		return tok
 	case '+':
-		tok := parser.Token{Type: parser.PLUS, Literal: string(l.ch)}
+		tok := token.Token{Type: token.PLUS, Literal: string(l.ch)}
 		l.readChar()
 		return tok
 	case '-':
-		tok := parser.Token{Type: parser.MINUS, Literal: string(l.ch)}
+		tok := token.Token{Type: token.MINUS, Literal: string(l.ch)}
 		l.readChar()
 		return tok
 	case '*':
-		tok := parser.Token{Type: parser.ASTERISK, Literal: string(l.ch)}
+		tok := token.Token{Type: token.ASTERISK, Literal: string(l.ch)}
 		l.readChar()
 		return tok
 	case '/':
-		tok := parser.Token{Type: parser.SLASH, Literal: string(l.ch)}
+		tok := token.Token{Type: token.SLASH, Literal: string(l.ch)}
 		l.readChar()
 		return tok
 	case 0:
-		return parser.Token{Type: parser.EOF, Literal: ""}
+		return token.Token{Type: token.EOF, Literal: ""}
 	default:
 		if isLetter(l.ch) {
 			literal := l.readIdentifier()
-			return parser.Token{Type: lookupIdent(literal), Literal: literal}
+			return token.Token{Type: lookupIdent(literal), Literal: literal}
 		} else if isDigit(l.ch) {
-			return parser.Token{Type: parser.INT, Literal: l.readNumber()}
+			return token.Token{Type: token.INT, Literal: l.readNumber()}
 		} else {
-			tok := parser.Token{Type: parser.ILLEGAL, Literal: string(l.ch)}
+			tok := token.Token{Type: token.ILLEGAL, Literal: string(l.ch)}
 			l.readChar()
 			return tok
 		}
@@ -99,13 +99,13 @@ func isDigit(ch byte) bool {
 	return unicode.IsDigit(rune(ch))
 }
 
-func lookupIdent(ident string) parser.TokenType {
+func lookupIdent(ident string) token.TokenType {
 	switch strings.ToLower(ident) {
 	case "set":
-		return parser.SET
+		return token.SET
 	case "print":
-		return parser.PRINT
+		return token.PRINT
 	default:
-		return parser.IDENT
+		return token.IDENT
 	}
 }

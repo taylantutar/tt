@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/taylantutar/tt/cmd/lexer"
-	"github.com/taylantutar/tt/pkg/parser"
+	"github.com/taylantutar/tt/cmd/parser"
+
 )
 
 func main() {
@@ -14,8 +15,11 @@ print a + b
 `
 
 	lexer := lexer.NewLexer(input)
+	parser := parser.NewParser(lexer)
 
-	for tok := lexer.NextToken(); tok.Type != parser.EOF; tok = lexer.NextToken() {
-		fmt.Printf("Token{Type: %-6s, Literal: %s}\n", tok.Type, tok.Literal)
+	program := parser.ParseProgram()
+
+	for _, stmt := range program {
+		fmt.Printf("%#v\n", stmt)
 	}
 }
