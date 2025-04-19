@@ -1,16 +1,16 @@
 package lexer
 
 import (
+	"github.com/taylantutar/tt/pkg/token"
 	"strings"
 	"unicode"
-	"github.com/taylantutar/tt/pkg/token"
 )
 
 type Lexer struct {
 	input        string
-	position     int  
-	readPosition int  
-	ch           byte 
+	position     int
+	readPosition int
+	ch           byte
 }
 
 func NewLexer(input string) *Lexer {
