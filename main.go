@@ -12,6 +12,7 @@ set a = 10
 set b = 5
 print a + b
 print a * b
+print a - b
 `
 
 	lexer := lexer.NewLexer(input)

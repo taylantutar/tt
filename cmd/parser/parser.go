@@ -1,10 +1,9 @@
 package parser
 
 import (
-	"strconv"
-
 	"github.com/taylantutar/tt/cmd/lexer"
 	"github.com/taylantutar/tt/pkg/token"
+	"strconv"
 )
 
 type Statement interface {

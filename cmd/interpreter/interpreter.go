@@ -2,7 +2,6 @@ package interpreter
 
 import (
 	"fmt"
-
 	"github.com/taylantutar/tt/cmd/parser"
 )
 
