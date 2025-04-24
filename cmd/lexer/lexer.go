@@ -10,7 +10,7 @@ type Lexer struct {
 	input        string
 	position     int
 	readPosition int
-	ch           byte
+	currentChar  byte
 }
 
 func NewLexer(input string) *Lexer {
@@ -21,9 +21,9 @@ func NewLexer(input string) *Lexer {
 
 func (l *Lexer) readChar() {
 	if l.readPosition >= len(l.input) {
-		l.ch = 0 // null karakter
+		l.currentChar = 0 // null karakter
 	} else {
-		l.ch = l.input[l.readPosition]
+		l.currentChar = l.input[l.readPosition]
 	}
 	l.position = l.readPosition
 	l.readPosition++
@@ -32,37 +32,37 @@ func (l *Lexer) readChar() {
 func (l *Lexer) NextToken() token.Token {
 	l.skipWhitespace()
 
-	switch l.ch {
+	switch l.currentChar {
 	case '=':
-		tok := token.Token{Type: token.ASSIGN, Literal: string(l.ch)}
+		tok := token.Token{Type: token.ASSIGN, Literal: string(l.currentChar)}
 		l.readChar()
 		return tok
 	case '+':
-		tok := token.Token{Type: token.PLUS, Literal: string(l.ch)}
+		tok := token.Token{Type: token.PLUS, Literal: string(l.currentChar)}
 		l.readChar()
 		return tok
 	case '-':
-		tok := token.Token{Type: token.MINUS, Literal: string(l.ch)}
+		tok := token.Token{Type: token.MINUS, Literal: string(l.currentChar)}
 		l.readChar()
 		return tok
 	case '*':
-		tok := token.Token{Type: token.ASTERISK, Literal: string(l.ch)}
+		tok := token.Token{Type: token.ASTERISK, Literal: string(l.currentChar)}
 		l.readChar()
 		return tok
 	case '/':
-		tok := token.Token{Type: token.SLASH, Literal: string(l.ch)}
+		tok := token.Token{Type: token.SLASH, Literal: string(l.currentChar)}
 		l.readChar()
 		return tok
 	case 0:
 		return token.Token{Type: token.EOF, Literal: ""}
 	default:
-		if isLetter(l.ch) {
+		if isLetter(l.currentChar) {
 			literal := l.readIdentifier()
 			return token.Token{Type: lookupIdent(literal), Literal: literal}
-		} else if isDigit(l.ch) {
+		} else if isDigit(l.currentChar) {
 			return token.Token{Type: token.INT, Literal: l.readNumber()}
 		} else {
-			tok := token.Token{Type: token.ILLEGAL, Literal: string(l.ch)}
+			tok := token.Token{Type: token.ILLEGAL, Literal: string(l.currentChar)}
 			l.readChar()
 			return tok
 		}
@@ -71,7 +71,7 @@ func (l *Lexer) NextToken() token.Token {
 
 func (l *Lexer) readIdentifier() string {
 	start := l.position
-	for isLetter(l.ch) {
+	for isLetter(l.currentChar) {
 		l.readChar()
 	}
 	return l.input[start:l.position]
@@ -79,14 +79,14 @@ func (l *Lexer) readIdentifier() string {
 
 func (l *Lexer) readNumber() string {
 	start := l.position
-	for isDigit(l.ch) {
+	for isDigit(l.currentChar) {
 		l.readChar()
 	}
 	return l.input[start:l.position]
 }
 
 func (l *Lexer) skipWhitespace() {
-	for l.ch == ' ' || l.ch == '\n' || l.ch == '\t' || l.ch == '\r' {
+	for l.currentChar == ' ' || l.currentChar == '\n' || l.currentChar == '\t' || l.currentChar == '\r' {
 		l.readChar()
 	}
 }

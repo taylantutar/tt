@@ -3,49 +3,11 @@ package parser
 import (
 	"github.com/taylantutar/tt/cmd/lexer"
 	"github.com/taylantutar/tt/pkg/token"
+	"github.com/taylantutar/tt/pkg/statement"
 	"strconv"
 )
 
-type Statement interface {
-	statementNode()
-}
 
-type Expression interface {
-	expressionNode()
-}
-
-type SetStatement struct {
-	Name  string
-	Value Expression
-}
-
-func (s *SetStatement) statementNode() {}
-
-type PrintStatement struct {
-	Expr Expression
-}
-
-func (s *PrintStatement) statementNode() {}
-
-type Identifier struct {
-	Value string
-}
-
-func (i *Identifier) expressionNode() {}
-
-type IntegerLiteral struct {
-	Value int
-}
-
-func (i *IntegerLiteral) expressionNode() {}
-
-type InfixExpression struct {
-	Left     Expression
-	Operator string
-	Right    Expression
-}
-
-func (i *InfixExpression) expressionNode() {}
 
 type Parser struct {
 	lexer     *lexer.Lexer
@@ -65,8 +27,8 @@ func (p *Parser) nextToken() {
 	p.peekToken = p.lexer.NextToken()
 }
 
-func (p *Parser) ParseProgram() []Statement {
-	var statements []Statement
+func (p *Parser) ParseProgram() []statement.Statement {
+	var statements []statement.Statement
 
 	for p.curToken.Type != token.EOF {
 		stmt := p.parseStatement()
@@ -79,7 +41,7 @@ func (p *Parser) ParseProgram() []Statement {
 	return statements
 }
 
-func (p *Parser) parseStatement() Statement {
+func (p *Parser) parseStatement() statement.Statement {
 	switch p.curToken.Type {
 	case token.SET:
 		return p.parseSetStatement()
@@ -90,7 +52,7 @@ func (p *Parser) parseStatement() Statement {
 	}
 }
 
-func (p *Parser) parseSetStatement() *SetStatement {
+func (p *Parser) parseSetStatement() *statement.SetStatement {
 	p.nextToken() // IDENT
 	name := p.curToken.Literal
 
@@ -99,16 +61,16 @@ func (p *Parser) parseSetStatement() *SetStatement {
 
 	value := p.parseExpression()
 
-	return &SetStatement{Name: name, Value: value}
+	return &statement.SetStatement{Name: name, Value: value}
 }
 
-func (p *Parser) parsePrintStatement() *PrintStatement {
+func (p *Parser) parsePrintStatement() *statement.PrintStatement {
 	p.nextToken()
 	expr := p.parseExpression()
-	return &PrintStatement{Expr: expr}
+	return &statement.PrintStatement{Expr: expr}
 }
 
-func (p *Parser) parseExpression() Expression {
+func (p *Parser) parseExpression() statement.Expression {
 	left := p.parsePrimary()
 
 	if p.peekToken.Type == token.PLUS || p.peekToken.Type == token.MINUS || p.peekToken.Type == token.ASTERISK || p.peekToken.Type == token.SLASH {
@@ -116,19 +78,19 @@ func (p *Parser) parseExpression() Expression {
 		p.nextToken() // operatöre geç
 		p.nextToken() // sağ operand
 		right := p.parsePrimary()
-		return &InfixExpression{Left: left, Operator: op, Right: right}
+		return &statement.InfixExpression{Left: left, Operator: op, Right: right}
 	}
 
 	return left
 }
 
-func (p *Parser) parsePrimary() Expression {
+func (p *Parser) parsePrimary() statement.Expression {
 	switch p.curToken.Type {
 	case token.IDENT:
-		return &Identifier{Value: p.curToken.Literal}
+		return &statement.Identifier{Value: p.curToken.Literal}
 	case token.INT:
 		val, _ := strconv.Atoi(p.curToken.Literal)
-		return &IntegerLiteral{Value: val}
+		return &statement.IntegerLiteral{Value: val}
 	default:
 		return nil
 	}

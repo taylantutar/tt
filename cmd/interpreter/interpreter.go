@@ -2,7 +2,7 @@ package interpreter
 
 import (
 	"fmt"
-	"github.com/taylantutar/tt/cmd/parser"
+	"github.com/taylantutar/tt/pkg/statement"
 )
 
 type Environment struct {
@@ -22,30 +22,30 @@ func (e *Environment) Get(name string) (int, bool) {
 	return val, ok
 }
 
-func Eval(stmts []parser.Statement, env *Environment) {
+func Eval(stmts []statement.Statement, env *Environment) {
 	for _, stmt := range stmts {
 		switch s := stmt.(type) {
-		case *parser.SetStatement:
+		case *statement.SetStatement:
 			val := evalExpression(s.Value, env)
 			env.Set(s.Name, val)
-		case *parser.PrintStatement:
+		case *statement.PrintStatement:
 			val := evalExpression(s.Expr, env)
 			fmt.Println(val)
 		}
 	}
 }
 
-func evalExpression(expr parser.Expression, env *Environment) int {
+func evalExpression(expr statement.Expression, env *Environment) int {
 	switch e := expr.(type) {
-	case *parser.IntegerLiteral:
+	case *statement.IntegerLiteral:
 		return e.Value
-	case *parser.Identifier:
+	case *statement.Identifier:
 		val, ok := env.Get(e.Value)
 		if !ok {
 			panic("Tanımsız değişken: " + e.Value)
 		}
 		return val
-	case *parser.InfixExpression:
+	case *statement.InfixExpression:
 		left := evalExpression(e.Left, env)
 		right := evalExpression(e.Right, env)
 		switch e.Operator {
